@@ -16,7 +16,7 @@ router.post("/signup", async (req, res) => {
 
     const token = jwt.sign({ userId: user._id }, secretKey);
 
-    return res.json({ status: true, token });
+    return res.json({ status: true, token, userId: user._id });
   } catch (err) {
     return res.status(422).json({
       status: false,
@@ -30,23 +30,43 @@ router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(422)
-      .send({ errorMessage: "Must provide email and password" });
+    return res.status(422).send({ message: "Must provide email and password" });
   }
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(404).send({ errorMessage: "Email not found" });
+    return res.status(404).send({ message: "Email not found" });
   }
 
   try {
     await user.comparePassword(password);
     const token = jwt.sign({ userId: user._id }, secretKey);
-    res.send({ token });
+    res.send({ token, userId: user._id });
   } catch (error) {
     return res
       .status(422)
-      .send({ errorMessage: "Invalid password or email", error });
+      .send({ message: "Invalid password or email", error });
+  }
+});
+
+router.get("/profile/:userId", async (req, res) => {
+  let { userId } = req.params;
+
+  try {
+    const userProfile = await User.findOne({ _id: userId });
+    if (!userProfile) {
+      res.status(404).send({ message: "Error fetching user profile" });
+    }
+    let user = {
+      name: userProfile.name,
+      email: userProfile.email,
+      date_registered: userProfile.date_registered
+    };
+
+    return res.json(user);
+  } catch (error) {
+    return res
+      .status(422)
+      .send({ message: "There was an error processing your request", error });
   }
 });
 
