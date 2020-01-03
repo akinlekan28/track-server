@@ -4,7 +4,8 @@
   "description": "backend api for a react-native app",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "start": "node index.js"
   },
   "author": "akintola olalekan",
   "license": "MIT",
