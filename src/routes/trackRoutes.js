@@ -33,4 +33,21 @@ router.post("/tracks", async (req, res) => {
   }
 });
 
+router.delete("/tracks/:id", async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(422).send({ message: "Track not supplied" });
+  }
+  try {
+    const track = await Track.findOne({ _id: id });
+    await track.remove();
+
+    res.send({ status: true, message: "Track information deleted" });
+  } catch (error) {
+    return res
+      .status(422)
+      .send({ message: "Error deleting track information", error });
+  }
+});
+
 module.exports = router;
